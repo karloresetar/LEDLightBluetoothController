@@ -5,4 +5,5 @@
     <string name="on" tools:ignore="PrivateResource">On</string>
     <string name="off" tools:ignore="PrivateResource">On</string>
     <string name="disconnect">Disconnect</string>
+    <string name="blink">Blink</string>
 </resources>
