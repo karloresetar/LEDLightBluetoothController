@@ -43,6 +43,9 @@ class ControlActivity: AppCompatActivity(){
             val controlLedOffButton: Button = findViewById(R.id.control_led_off)
             controlLedOffButton.setOnClickListener { sendCommand("B") }
 
+            val controlLedBlinkButton: Button = findViewById(R.id.control_led_blink)
+            controlLedBlinkButton.setOnClickListener { sendCommand("C") }
+
             val controlLedDisconnectButton: Button = findViewById(R.id.control_led_disconnect)
             controlLedDisconnectButton.setOnClickListener { disconnect() }
 
