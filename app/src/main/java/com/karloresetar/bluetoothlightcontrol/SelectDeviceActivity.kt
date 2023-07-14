@@ -41,6 +41,13 @@ class SelectDeviceActivity : AppCompatActivity() {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
+    data class BluetoothDeviceInfo(val name: String, val address: String) {
+        override fun toString(): String {
+            return "$name\n$address" // Customize the string representation as per your requirement
+        }
+    }
+
+
 
     @SuppressLint("MissingPermission")
     @RequiresApi(Build.VERSION_CODES.S)
@@ -94,12 +101,15 @@ class SelectDeviceActivity : AppCompatActivity() {
         Log.d("SelectDeviceActivity", "Bluetooth permission granted")
 
         m_pairedDevices = bluetoothAdapter!!.bondedDevices
-        val list: ArrayList<BluetoothDevice> = ArrayList()
+        val list: ArrayList<BluetoothDeviceInfo> = ArrayList()
 
         if (!m_pairedDevices.isEmpty()) {
             for (device: BluetoothDevice in m_pairedDevices) {
-                list.add(device)
-                Log.i("device", "" + device)
+                val name = device.name ?: "Unknown Device"
+                val address = device.address
+                val deviceInfo = BluetoothDeviceInfo(name, address)
+                list.add(deviceInfo)
+                Log.i("device", deviceInfo.toString())
             }
         } else {
             showToast(this, "No paired Bluetooth devices found")
@@ -109,7 +119,7 @@ class SelectDeviceActivity : AppCompatActivity() {
         val deviceList: ListView = findViewById(R.id.select_device_list)
         deviceList.adapter = adapter
         deviceList.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            val device: BluetoothDevice = list[position]
+            val device: BluetoothDeviceInfo = list[position]
             val address: String = device.address
 
             val intent = Intent(this, ControlActivity::class.java)
@@ -149,7 +159,7 @@ class SelectDeviceActivity : AppCompatActivity() {
         if (requestCode == PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 showToast(this, "Bluetooth permission granted")
-                // Permission granted, continue with the logic
+
                 pairedDeviceList()
             } else {
                 showToast(
@@ -164,6 +174,7 @@ class SelectDeviceActivity : AppCompatActivity() {
 
 
 
+    // Ova funkcija se poziva kada aktivnost koja je pokrenuta preko intenta vrati rezultat.
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_ENABLE_BLUETOOTH){

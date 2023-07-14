@@ -3,7 +3,8 @@
 
     <string name="refresh">Refresh</string>
     <string name="on" tools:ignore="PrivateResource">On</string>
-    <string name="off" tools:ignore="PrivateResource">On</string>
+    <string name="off" tools:ignore="PrivateResource">Off</string>
     <string name="disconnect">Disconnect</string>
     <string name="blink">Blink</string>
+    <string name="brightnessSubmit">Submit Brightness</string>
 </resources>

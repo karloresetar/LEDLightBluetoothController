@@ -44,4 +44,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/control_led_blink" />
 
+    <EditText
+        android:id="@+id/brightness_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:paddingTop="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/control_led_disconnect"
+        android:hint="Enter brightness (0-100),0=off, 100 = 100%"
+        tools:ignore="VisualLintTextFieldSize"/>
+
+    <Button
+        android:id="@+id/submit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/brightness_input"
+        android:text="@string/brightnessSubmit"
+        />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

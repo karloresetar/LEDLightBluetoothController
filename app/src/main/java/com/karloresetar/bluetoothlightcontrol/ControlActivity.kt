@@ -13,6 +13,8 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.io.IOException
 import java.util.UUID
@@ -30,6 +32,10 @@ class ControlActivity: AppCompatActivity(){
     }
 
 
+    lateinit var brightnessInput: EditText
+    lateinit var submitButton: Button
+
+
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.control_layout)
@@ -38,16 +44,24 @@ class ControlActivity: AppCompatActivity(){
             ConnectToDevice(this).execute()
 
             val controlLedOnButton: Button = findViewById(R.id.control_led_on)
-            controlLedOnButton.setOnClickListener { sendCommand("A") }
+            controlLedOnButton.setOnClickListener { sendCommand("X") }
 
             val controlLedOffButton: Button = findViewById(R.id.control_led_off)
-            controlLedOffButton.setOnClickListener { sendCommand("B") }
+            controlLedOffButton.setOnClickListener { sendCommand("Y") }
 
             val controlLedBlinkButton: Button = findViewById(R.id.control_led_blink)
-            controlLedBlinkButton.setOnClickListener { sendCommand("C") }
+            controlLedBlinkButton.setOnClickListener { sendCommand("Z") }
 
             val controlLedDisconnectButton: Button = findViewById(R.id.control_led_disconnect)
             controlLedDisconnectButton.setOnClickListener { disconnect() }
+
+
+            brightnessInput = findViewById(R.id.brightness_input)
+            submitButton = findViewById(R.id.submit_button)
+
+
+            submitButton.setOnClickListener { sendBrightnessCommand() }
+
 
         }
     }
@@ -63,6 +77,17 @@ class ControlActivity: AppCompatActivity(){
 
     }
 
+
+    private fun sendIntCommand(input: Int){
+        if(m_bluetoothSocket != null){
+            try{
+                m_bluetoothSocket!!.outputStream.write(input)
+            } catch(e: IOException){
+                e.printStackTrace()
+            }
+        }
+
+    }
     private fun disconnect(){
         if(m_bluetoothSocket != null){
             try{
@@ -77,6 +102,24 @@ class ControlActivity: AppCompatActivity(){
 
     }
 
+    private fun sendBrightnessCommand() {
+        val brightnessText = brightnessInput.text.toString()
+        if (brightnessText.isNotEmpty()) {
+            val brightnessValue = brightnessText.toIntOrNull()
+            if (brightnessValue != null && brightnessValue >= 0 && brightnessValue <= 100) {
+                sendIntCommand(brightnessValue)
+            } else {
+
+                Toast.makeText(this, "Invalid input; must be between 0-100!", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+
+            Toast.makeText(this, "Please enter a brightness value", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+
     private class ConnectToDevice(c: Context) : AsyncTask<Void, Void, String>(){
 
         private var connectSuccess: Boolean = true
@@ -88,7 +131,7 @@ class ControlActivity: AppCompatActivity(){
 
         override fun onPreExecute() {
             super.onPreExecute()
-            m_progress = ProgressDialog.show(context,"Connecting...","pleaase wait")
+            m_progress = ProgressDialog.show(context,"Connecting...","please wait")
         }
 
         @SuppressLint("MissingPermission")
