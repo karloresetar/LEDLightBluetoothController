@@ -14,6 +14,8 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.SeekBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.io.IOException
@@ -21,7 +23,7 @@ import java.util.UUID
 
 class ControlActivity: AppCompatActivity(){
 
-    //koriste se za koristenje u drugim klasama
+
     companion object{
         var m_myUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
         var m_bluetoothSocket: BluetoothSocket? = null
@@ -36,6 +38,11 @@ class ControlActivity: AppCompatActivity(){
     lateinit var submitButton: Button
 
 
+    lateinit var brightnessSlider: SeekBar
+    lateinit var brightnessValueText: TextView
+
+
+
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.control_layout)
@@ -44,13 +51,13 @@ class ControlActivity: AppCompatActivity(){
             ConnectToDevice(this).execute()
 
             val controlLedOnButton: Button = findViewById(R.id.control_led_on)
-            controlLedOnButton.setOnClickListener { sendCommand("X") }
+            controlLedOnButton.setOnClickListener { sendCommand("x") }
 
             val controlLedOffButton: Button = findViewById(R.id.control_led_off)
-            controlLedOffButton.setOnClickListener { sendCommand("Y") }
+            controlLedOffButton.setOnClickListener { sendCommand("y") }
 
             val controlLedBlinkButton: Button = findViewById(R.id.control_led_blink)
-            controlLedBlinkButton.setOnClickListener { sendCommand("Z") }
+            controlLedBlinkButton.setOnClickListener { sendCommand("z") }
 
             val controlLedDisconnectButton: Button = findViewById(R.id.control_led_disconnect)
             controlLedDisconnectButton.setOnClickListener { disconnect() }
@@ -58,9 +65,20 @@ class ControlActivity: AppCompatActivity(){
 
             brightnessInput = findViewById(R.id.brightness_input)
             submitButton = findViewById(R.id.submit_button)
-
-
             submitButton.setOnClickListener { sendBrightnessCommand() }
+
+            brightnessSlider = findViewById(R.id.brightness_slider)
+            brightnessValueText = findViewById(R.id.brightness_value_text)
+            brightnessSlider.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    val brightnessText = getString(R.string.brightnessProgress) + " $progress"
+                    brightnessValueText.text = brightnessText
+                    sendIntCommand(progress)
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
 
 
         }
