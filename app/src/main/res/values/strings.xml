@@ -7,4 +7,5 @@
     <string name="disconnect">Disconnect</string>
     <string name="blink">Blink</string>
     <string name="brightnessSubmit">Submit Brightness</string>
+    <string name="brightnessProgress">Brightness:</string>
 </resources>
