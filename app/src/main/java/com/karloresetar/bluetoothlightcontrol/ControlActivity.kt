@@ -7,24 +7,22 @@ import android.app.ProgressDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
-import android.content.Context
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.SeekBar
+import androidx.appcompat.widget.SwitchCompat
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.io.IOException
 import java.util.UUID
 
-class ControlActivity: AppCompatActivity(){
+class ControlActivity : AppCompatActivity() {
 
-
-    companion object{
+    companion object {
         var m_myUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
         var m_bluetoothSocket: BluetoothSocket? = null
         lateinit var m_progress: ProgressDialog
@@ -33,35 +31,35 @@ class ControlActivity: AppCompatActivity(){
         lateinit var m_address: String
     }
 
-
     lateinit var brightnessInput: EditText
     lateinit var submitButton: Button
-
-
     lateinit var brightnessSlider: SeekBar
     lateinit var brightnessValueText: TextView
+    lateinit var controlLedSwitch: SwitchCompat
 
-
-
-    override fun onCreate(savedInstanceState: Bundle?){
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.control_layout)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             m_address = intent.getStringExtra(SelectDeviceActivity.EXTRA_ADDRESS).toString()
             ConnectToDevice(this).execute()
 
-            val controlLedOnButton: Button = findViewById(R.id.control_led_on)
-            controlLedOnButton.setOnClickListener { sendCommand("x") }
-
-            val controlLedOffButton: Button = findViewById(R.id.control_led_off)
-            controlLedOffButton.setOnClickListener { sendCommand("y") }
+            controlLedSwitch = findViewById(R.id.control_led_switch)
+            controlLedSwitch.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    // Turn on the LED (Send the "x" command to the Bluetooth device)
+                    sendCommand("x")
+                } else {
+                    // Turn off the LED (Send the "y" command to the Bluetooth device)
+                    sendCommand("y")
+                }
+            }
 
             val controlLedBlinkButton: Button = findViewById(R.id.control_led_blink)
             controlLedBlinkButton.setOnClickListener { sendCommand("z") }
 
             val controlLedDisconnectButton: Button = findViewById(R.id.control_led_disconnect)
             controlLedDisconnectButton.setOnClickListener { disconnect() }
-
 
             brightnessInput = findViewById(R.id.brightness_input)
             submitButton = findViewById(R.id.submit_button)
@@ -79,45 +77,40 @@ class ControlActivity: AppCompatActivity(){
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {}
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             })
-
-
         }
     }
 
-    private fun sendCommand(input: String){
-        if(m_bluetoothSocket != null){
-            try{
+    private fun sendCommand(input: String) {
+        if (m_bluetoothSocket != null) {
+            try {
                 m_bluetoothSocket!!.outputStream.write(input.toByteArray())
-            } catch(e: IOException){
+            } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
-
     }
 
-
-    private fun sendIntCommand(input: Int){
-        if(m_bluetoothSocket != null){
-            try{
+    private fun sendIntCommand(input: Int) {
+        if (m_bluetoothSocket != null) {
+            try {
                 m_bluetoothSocket!!.outputStream.write(input)
-            } catch(e: IOException){
+            } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
-
     }
-    private fun disconnect(){
-        if(m_bluetoothSocket != null){
-            try{
+
+    private fun disconnect() {
+        if (m_bluetoothSocket != null) {
+            try {
                 m_bluetoothSocket!!.close()
                 m_bluetoothSocket = null
                 m_isConnected = false
-            } catch (e: IOException){
+            } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
         finish()
-
     }
 
     private fun sendBrightnessCommand() {
@@ -127,33 +120,29 @@ class ControlActivity: AppCompatActivity(){
             if (brightnessValue != null && brightnessValue >= 0 && brightnessValue <= 100) {
                 sendIntCommand(brightnessValue)
             } else {
-
-                Toast.makeText(this, "Invalid input; must be between 0-100!", Toast.LENGTH_SHORT).show()
+                showToast("Invalid input; must be between 0-100!")
             }
         } else {
-
-            Toast.makeText(this, "Please enter a brightness value", Toast.LENGTH_SHORT).show()
+            showToast("Please enter a brightness value")
         }
     }
 
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
 
-
-    private class ConnectToDevice(c: Context) : AsyncTask<Void, Void, String>(){
+    private class ConnectToDevice(private val activity: ControlActivity) :
+        AsyncTask<Void, Void, BluetoothDevice?>() {
 
         private var connectSuccess: Boolean = true
-        private val context: Context
-
-        init{
-            this.context = c
-        }
 
         override fun onPreExecute() {
             super.onPreExecute()
-            m_progress = ProgressDialog.show(context,"Connecting...","please wait")
+            m_progress = ProgressDialog.show(activity, "Connecting...", "please wait")
         }
 
         @SuppressLint("MissingPermission")
-        override fun doInBackground(vararg params: Void?): String? {
+        override fun doInBackground(vararg params: Void?): BluetoothDevice? {
             try {
                 if (m_bluetoothSocket == null || !m_isConnected) {
                     m_bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
@@ -165,17 +154,20 @@ class ControlActivity: AppCompatActivity(){
                 connectSuccess = false
                 e.printStackTrace()
             }
-            return null
+            return if (connectSuccess) m_bluetoothSocket!!.remoteDevice else null
         }
 
-
-        override fun onPostExecute(result: String?) {
+        @SuppressLint("MissingPermission")
+        override fun onPostExecute(result: BluetoothDevice?) {
             super.onPostExecute(result)
-            if (!connectSuccess) {
-                Log.i("data", "coudlnt connect")
-            }else {
-                m_isConnected = true
+            if (result != null) {
+                val deviceName = result.name
+                activity.showToast("Connected to device: $deviceName")
+            } else {
+                activity.showToast("Could not connect to device")
+                activity.finish()
             }
+            m_isConnected = result != null
             m_progress.dismiss()
         }
     }

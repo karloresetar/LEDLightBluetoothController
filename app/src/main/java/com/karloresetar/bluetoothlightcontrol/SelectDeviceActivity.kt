@@ -113,6 +113,12 @@ class SelectDeviceActivity : AppCompatActivity() {
             }
         } else {
             showToast(this, "No paired Bluetooth devices found")
+            if (!bluetoothAdapter!!.isEnabled) {
+                val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH)
+            } else {
+                checkBluetoothPermission()
+            }
         }
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, list)

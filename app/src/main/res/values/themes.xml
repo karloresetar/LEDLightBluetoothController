@@ -3,4 +3,9 @@
     <style name="Theme.BluetoothLightControl" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme attributes if needed -->
     </style>
+
+    <style name="SwitchTextStyle" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="android:textSize">16sp</item>
+    </style>
+
 </resources>
