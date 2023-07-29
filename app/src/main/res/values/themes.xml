@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.BluetoothLightControl" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="Theme.BluetoothLightControl" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme attributes if needed -->
     </style>
 
     <style name="SwitchTextStyle" parent="Widget.AppCompat.CompoundButton.Switch">
         <item name="android:textSize">16sp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
 </resources>

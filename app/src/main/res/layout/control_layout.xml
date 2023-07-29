@@ -1,33 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#35424a"
+    tools:context="com.karloresetar.bluetoothlightcontrol.ControlActivity">
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/control_led_switch"
+        style="@style/SwitchTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:thumb="@drawable/thumb"
-        app:track="@drawable/track"
-        app:showText="true"
-        android:textOn="@string/text_on"
-        android:textOff="@string/text_off"
         android:layout_margin="25dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textOff="@string/text_off"
+        android:textOn="@string/text_on"
+        android:thumb="@drawable/thumb"
         app:layout_constraintEnd_toEndOf="parent"
-        style="@style/SwitchTextStyle"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:showText="true"
+        app:track="@drawable/track" />
 
 
     <Button
         android:id="@+id/control_led_blink"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/blink"
         android:layout_marginTop="16dp"
+        android:text="@string/blink"
+        android:background="@drawable/custom_buttons"
+        android:textColor="@color/btn_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/control_led_switch" />
@@ -36,35 +39,42 @@
         android:id="@+id/brightness_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="number"
         android:layout_marginTop="50dp"
+        android:textColor="@color/orange"
+        android:textAlignment="center"
+        android:textColorHint="@color/orange"
+        android:backgroundTintMode="multiply"
+        android:hint="@string/brightnessHint"
+        android:inputType="number"
         android:paddingTop="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/control_led_blink"
-        android:hint="Enter brightness (0-100),0=off, 100 = 100%"
-        tools:ignore="VisualLintTextFieldSize" />
+        tools:ignore="VisualLintTextFieldSize"
+        android:importantForAutofill="no" />
 
     <Button
         android:id="@+id/submit_button"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/btn_color"
+        android:text="@string/brightnessSubmit"
+        android:background="@drawable/custom_buttons"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/brightness_input"
-        android:layout_marginTop="10dp"
-        android:text="@string/brightnessSubmit" />
+        app:layout_constraintTop_toBottomOf="@id/brightness_input" />
 
     <SeekBar
         android:id="@+id/brightness_slider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:max="100"
-        android:progress="0"
         android:layout_marginTop="18dp"
+        android:max="100"
         android:paddingTop="50dp"
-        android:thumb="@android:drawable/btn_default_small"
+        android:progress="0"
         android:progressDrawable="@android:drawable/progress_horizontal"
+        android:thumb="@android:drawable/btn_default_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/submit_button" />
@@ -77,7 +87,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="8dp"
         android:text="@string/brightnessProgress"
-        android:textColor="#000000"
+        android:textColor="@color/orange"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -85,11 +95,13 @@
 
     <Button
         android:id="@+id/control_led_disconnect"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:text="@string/disconnect"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="32dp"
+        android:text="@string/disconnect"
+        android:textColor="@color/btn_color"
+        android:background="@drawable/custom_buttons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
