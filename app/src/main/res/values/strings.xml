@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="app_name">BluetoothLightControl</string>
 
     <string name="refresh">Refresh</string>
@@ -8,4 +8,5 @@
     <string name="blink">Blink</string>
     <string name="brightnessSubmit">Submit Brightness</string>
     <string name="brightnessProgress">Brightness:</string>
+    <string name="brightnessHint">Enter brightness (0–100),0=off, 100 = 100%</string>
 </resources>

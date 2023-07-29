@@ -43,7 +43,7 @@ class SelectDeviceActivity : AppCompatActivity() {
 
     data class BluetoothDeviceInfo(val name: String, val address: String) {
         override fun toString(): String {
-            return "$name\n$address" // Customize the string representation as per your requirement
+            return "$name\n$address"
         }
     }
 
@@ -180,7 +180,7 @@ class SelectDeviceActivity : AppCompatActivity() {
 
 
 
-    // Ova funkcija se poziva kada aktivnost koja je pokrenuta preko intenta vrati rezultat.
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_ENABLE_BLUETOOTH){

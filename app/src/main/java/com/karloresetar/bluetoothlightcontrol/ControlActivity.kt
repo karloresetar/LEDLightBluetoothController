@@ -7,7 +7,6 @@ import android.app.ProgressDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
@@ -17,6 +16,9 @@ import androidx.appcompat.widget.SwitchCompat
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID
 
@@ -42,7 +44,7 @@ class ControlActivity : AppCompatActivity() {
         setContentView(R.layout.control_layout)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             m_address = intent.getStringExtra(SelectDeviceActivity.EXTRA_ADDRESS).toString()
-            ConnectToDevice(this).execute()
+            connectToDevice()
 
             controlLedSwitch = findViewById(R.id.control_led_switch)
             controlLedSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -72,6 +74,8 @@ class ControlActivity : AppCompatActivity() {
                     val brightnessText = getString(R.string.brightnessProgress) + " $progress"
                     brightnessValueText.text = brightnessText
                     sendIntCommand(progress)
+
+
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -131,18 +135,11 @@ class ControlActivity : AppCompatActivity() {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
-    private class ConnectToDevice(private val activity: ControlActivity) :
-        AsyncTask<Void, Void, BluetoothDevice?>() {
-
-        private var connectSuccess: Boolean = true
-
-        override fun onPreExecute() {
-            super.onPreExecute()
-            m_progress = ProgressDialog.show(activity, "Connecting...", "please wait")
-        }
-
-        @SuppressLint("MissingPermission")
-        override fun doInBackground(vararg params: Void?): BluetoothDevice? {
+    @SuppressLint("MissingPermission")
+    private fun connectToDevice() {
+        m_progress = ProgressDialog.show(this, "Connecting...", "please wait")
+        lifecycleScope.launch(Dispatchers.IO) {
+            var connectSuccess = true
             try {
                 if (m_bluetoothSocket == null || !m_isConnected) {
                     m_bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
@@ -154,23 +151,18 @@ class ControlActivity : AppCompatActivity() {
                 connectSuccess = false
                 e.printStackTrace()
             }
-            return if (connectSuccess) m_bluetoothSocket!!.remoteDevice else null
-        }
 
-        @SuppressLint("MissingPermission")
-        override fun onPostExecute(result: BluetoothDevice?) {
-            super.onPostExecute(result)
-            if (result != null) {
-                val deviceName = result.name
-                activity.showToast("Connected to device: $deviceName")
-            } else {
-                activity.showToast("Could not connect to device")
-                activity.finish()
+            launch(Dispatchers.Main) {
+                m_progress.dismiss()
+                if (connectSuccess) {
+                    val deviceName = m_bluetoothSocket!!.remoteDevice.name
+                    showToast("Connected to device: $deviceName")
+                } else {
+                    showToast("Could not connect to device")
+                    finish()
+                }
+                m_isConnected = connectSuccess
             }
-            m_isConnected = result != null
-            m_progress.dismiss()
         }
     }
-
-
 }
