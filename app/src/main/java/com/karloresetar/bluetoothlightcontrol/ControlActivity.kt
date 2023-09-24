@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.io.IOException
 import java.util.UUID
 
@@ -49,16 +50,16 @@ class ControlActivity : AppCompatActivity() {
             controlLedSwitch = findViewById(R.id.control_led_switch)
             controlLedSwitch.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    // Turn on the LED (Send the "x" command to the Bluetooth device)
-                    sendCommand("x")
+
+                    sendCommand("turn_on")
                 } else {
-                    // Turn off the LED (Send the "y" command to the Bluetooth device)
-                    sendCommand("y")
+
+                    sendCommand("turn_off")
                 }
             }
 
             val controlLedBlinkButton: Button = findViewById(R.id.control_led_blink)
-            controlLedBlinkButton.setOnClickListener { sendCommand("z") }
+            controlLedBlinkButton.setOnClickListener { sendCommand("blink") }
 
             val controlLedDisconnectButton: Button = findViewById(R.id.control_led_disconnect)
             controlLedDisconnectButton.setOnClickListener { disconnect() }
@@ -73,7 +74,7 @@ class ControlActivity : AppCompatActivity() {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     val brightnessText = getString(R.string.brightnessProgress) + " $progress"
                     brightnessValueText.text = brightnessText
-                    sendIntCommand(progress)
+                    sendCommand("set_brightness", progress)
 
 
                 }
@@ -84,52 +85,6 @@ class ControlActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendCommand(input: String) {
-        if (m_bluetoothSocket != null) {
-            try {
-                m_bluetoothSocket!!.outputStream.write(input.toByteArray())
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    private fun sendIntCommand(input: Int) {
-        if (m_bluetoothSocket != null) {
-            try {
-                m_bluetoothSocket!!.outputStream.write(input)
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    private fun disconnect() {
-        if (m_bluetoothSocket != null) {
-            try {
-                m_bluetoothSocket!!.close()
-                m_bluetoothSocket = null
-                m_isConnected = false
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-        finish()
-    }
-
-    private fun sendBrightnessCommand() {
-        val brightnessText = brightnessInput.text.toString()
-        if (brightnessText.isNotEmpty()) {
-            val brightnessValue = brightnessText.toIntOrNull()
-            if (brightnessValue != null && brightnessValue >= 0 && brightnessValue <= 100) {
-                sendIntCommand(brightnessValue)
-            } else {
-                showToast("Invalid input; must be between 0-100!")
-            }
-        } else {
-            showToast("Please enter a brightness value")
-        }
-    }
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -165,4 +120,47 @@ class ControlActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun sendCommand(command: String, value: Int? = null) {
+        if (m_bluetoothSocket != null) {
+            try {
+                val json = JSONObject()
+                json.put("command", command)
+                value?.let { json.put("value", it) }
+                m_bluetoothSocket!!.outputStream.write(json.toString().toByteArray())
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun sendBrightnessCommand() {
+        val brightnessText = brightnessInput.text.toString()
+        if (brightnessText.isNotEmpty()) {
+            val brightnessValue = brightnessText.toIntOrNull()
+            if (brightnessValue != null && brightnessValue >= 0 && brightnessValue <= 255) {
+                sendCommand("set_brightness", brightnessValue)
+            } else {
+                showToast("Invalid input; must be between 0-255!")
+            }
+        } else {
+            showToast("Please enter a brightness value")
+        }
+    }
+
+
+    private fun disconnect() {
+        if (m_bluetoothSocket != null) {
+            try {
+                m_bluetoothSocket!!.close()
+                m_bluetoothSocket = null
+                m_isConnected = false
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+        finish()
+    }
+
+
 }
