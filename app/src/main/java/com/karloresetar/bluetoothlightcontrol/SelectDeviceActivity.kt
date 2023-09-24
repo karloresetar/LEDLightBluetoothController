@@ -88,7 +88,7 @@ class SelectDeviceActivity : AppCompatActivity() {
                 Manifest.permission.BLUETOOTH_CONNECT
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // Request the missing permission
+
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.BLUETOOTH_CONNECT),
@@ -97,7 +97,7 @@ class SelectDeviceActivity : AppCompatActivity() {
             return
         }
 
-        // Permission is already granted, continue with the logic
+
         Log.d("SelectDeviceActivity", "Bluetooth permission granted")
 
         m_pairedDevices = bluetoothAdapter!!.bondedDevices
@@ -141,14 +141,14 @@ class SelectDeviceActivity : AppCompatActivity() {
                 Manifest.permission.BLUETOOTH
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // Request the missing permission
+
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.BLUETOOTH),
                 PERMISSION_REQUEST_CODE
             )
         } else {
-            // Permission is already granted, continue with the logic
+
             pairedDeviceList()
         }
     }
