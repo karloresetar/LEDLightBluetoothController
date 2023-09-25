@@ -3,7 +3,7 @@ This mobile application was made as a graduation thesis for my bachelor's degree
 
 ---
 
-Layout to select the device you want to connect to.
+Layout which allows to select the device you want to connect to.
 
 <img src="https://github.com/karloresetar/LEDLightBluetoothController/assets/39807142/26e155c6-5cdb-4bc0-b5b1-7874fc134e1d" width="200" height="400">
 
